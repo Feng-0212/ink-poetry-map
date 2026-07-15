@@ -71,8 +71,20 @@ function layout(poems) {
 const SVGNS = 'http://www.w3.org/2000/svg';
 const sitesG = document.getElementById('sites');
 
+function svgFragment(markup) {
+  const doc = new DOMParser().parseFromString(
+    '<svg xmlns="http://www.w3.org/2000/svg">' + markup + '</svg>', 'image/svg+xml');
+  const frag = document.createDocumentFragment();
+  const root = doc.documentElement;
+  while (root.firstChild) {
+    frag.appendChild(document.importNode(root.firstChild, true));
+    root.removeChild(root.firstChild);
+  }
+  return frag;
+}
+
 function render(poems) {
-  sitesG.innerHTML = '';
+  while (sitesG.firstChild) sitesG.removeChild(sitesG.firstChild);
   const placed = layout(poems);
   placed.forEach(({ poem, x, y, scene }) => {
     const g = document.createElementNS(SVGNS, 'g');
@@ -81,10 +93,10 @@ function render(poems) {
     g.setAttribute('tabindex', '0');
     g.setAttribute('role', 'button');
     g.setAttribute('aria-label', `${poem.title} · ${poem.dynasty} · ${poem.author}`);
-    g.innerHTML = `
-      <circle class="spot-token" r="17"></circle>
-      <circle class="spot-glow" r="17"></circle>
-      <g class="spot-icon">${SCENES[scene] || SCENES.mountain}</g>`;
+    g.appendChild(svgFragment(
+      '<circle class="spot-token" r="18"></circle>' +
+      '<circle class="spot-glow" r="18"></circle>' +
+      '<g class="spot-icon">' + (SCENES[scene] || SCENES.mountain) + '</g>'));
     g.addEventListener('click', () => showPoem(poem));
     g.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showPoem(poem); }
@@ -118,5 +130,5 @@ const POEMS = (typeof window !== 'undefined' && window.POEMS) ? window.POEMS : [
 if (POEMS.length) {
   render(POEMS);
 } else {
-  sitesG.innerHTML = '<text x="600" y="400" text-anchor="middle" fill="#8b3a3a" font-size="20" font-family="serif">未找到诗词数据，请检查 poems.js</text>';
+  sitesG.appendChild(svgFragment('<text x="600" y="400" text-anchor="middle" fill="#8b3a3a" font-size="20" font-family="serif">未找到诗词数据，请检查 poems.js</text>'));
 }

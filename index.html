@@ -44,117 +44,40 @@
           <stop offset="0%" stop-color="#4a4a48" stop-opacity="0.9"/>
           <stop offset="100%" stop-color="#2a2a28" stop-opacity="0.4"/>
         </radialGradient>
+        <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#caa24a" stop-opacity="0.85"/>
+          <stop offset="60%" stop-color="#caa24a" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#caa24a" stop-opacity="0"/>
+        </radialGradient>
       </defs>
 
       <!-- 天空 -->
       <rect width="1200" height="800" fill="url(#skyGrad)"/>
 
+      <!-- 落日 -->
+      <circle cx="1010" cy="150" r="120" fill="url(#sun)"/>
+      <circle cx="1010" cy="150" r="48" fill="#c79a3e" opacity="0.5" filter="url(#ink-blur)"/>
+
       <!-- 远山层 -->
-      <path class="mountain far" d="M0,420 Q150,280 300,380 T600,320 T900,360 T1200,300 L1200,800 L0,800Z" fill="#9a9590" opacity="0.35"/>
-      <path class="mountain far" d="M0,480 Q200,350 450,420 T800,380 T1200,400 L1200,800 L0,800Z" fill="#8a8580" opacity="0.4"/>
+      <path class="mountain far" d="M0,420 Q150,280 300,380 T600,320 T900,360 T1200,300 L1200,800 L0,800Z" fill="#9a9590" opacity="0.30"/>
+      <path class="mountain far" d="M0,480 Q200,350 450,420 T800,380 T1200,400 L1200,800 L0,800Z" fill="#8a8580" opacity="0.38"/>
 
       <!-- 主江河 -->
       <path class="river" d="M-50,520 Q200,500 400,540 Q600,580 800,520 Q1000,460 1250,500 L1250,800 L-50,800Z" fill="url(#waterGrad)" filter="url(#ink-blur)"/>
       <path class="river-shimmer" d="M100,530 Q350,510 550,550 Q750,590 950,530" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="2"/>
 
       <!-- 中景山峦 -->
-      <path class="mountain mid" d="M80,500 Q180,320 280,400 Q380,280 480,380 Q580,260 680,360 Q780,300 880,400 Q980,340 1080,420 L1080,800 L80,800Z" fill="#5c5a56" opacity="0.55" filter="url(#ink-wash)"/>
+      <path class="mountain mid" d="M80,500 Q180,320 280,400 Q380,280 480,380 Q580,260 680,360 Q780,300 880,400 Q980,340 1080,420 L1080,800 L80,800Z" fill="#5c5a56" opacity="0.5" filter="url(#ink-wash)"/>
 
-      <!-- 近景主峰 — 华山 -->
-      <g class="poem-spot" data-poem="huashan" tabindex="0" role="button" aria-label="华山">
-        <path class="mountain near" d="M420,800 L520,280 L620,800Z" fill="#2e2e2c" opacity="0.85"/>
-        <path class="mountain near" d="M480,800 L560,380 L640,800Z" fill="#1a1a18" opacity="0.7"/>
-        <circle class="spot-glow" cx="560" cy="320" r="28"/>
-        <text class="spot-label" x="560" y="260">华山</text>
-      </g>
+      <!-- 云气 -->
+      <path d="M120,150 C260,120 360,170 520,140 C420,180 300,200 200,200 Z" fill="#fff" opacity="0.16" filter="url(#ink-blur)"/>
+      <path d="M760,110 C900,85 1000,130 1160,105 C1060,145 940,165 850,160 Z" fill="#fff" opacity="0.14" filter="url(#ink-blur)"/>
 
-      <!-- 庐山瀑布区 -->
-      <g class="poem-spot" data-poem="lushan" tabindex="0" role="button" aria-label="庐山">
-        <path class="mountain near" d="M180,800 L260,420 L340,800Z" fill="#3a3a38" opacity="0.75"/>
-        <path class="waterfall" d="M248,420 Q252,500 250,580 Q248,620 252,680" stroke="#7a8a90" stroke-width="4" fill="none" opacity="0.6"/>
-        <circle class="spot-glow" cx="250" cy="400" r="24"/>
-        <text class="spot-label" x="250" y="370">庐山</text>
-      </g>
-
-      <!-- 西湖 -->
-      <g class="poem-spot" data-poem="xihu" tabindex="0" role="button" aria-label="西湖">
-        <ellipse class="lake" cx="850" cy="620" rx="90" ry="45" fill="#6b7d82" opacity="0.45"/>
-        <circle class="spot-glow" cx="850" cy="620" r="22"/>
-        <text class="spot-label" x="850" y="580">西湖</text>
-      </g>
-
-      <!-- 竹林山居 -->
-      <g class="poem-spot" data-poem="shanju" tabindex="0" role="button" aria-label="山居">
-        <g class="bamboo" transform="translate(720, 480)">
-          <line x1="0" y1="0" x2="0" y2="80" stroke="#3a4a3a" stroke-width="3"/>
-          <line x1="15" y1="10" x2="15" y2="90" stroke="#2a3a2a" stroke-width="2.5"/>
-          <line x1="30" y1="5" x2="30" y2="85" stroke="#3a4a3a" stroke-width="3"/>
-          <line x1="-8" y1="20" x2="38" y2="35" stroke="#4a5a4a" stroke-width="1.5"/>
-          <line x1="-5" y1="45" x2="35" y2="55" stroke="#4a5a4a" stroke-width="1.5"/>
-        </g>
-        <rect class="pavilion" x="740" y="530" width="40" height="30" fill="#2a2a28" opacity="0.6" rx="2"/>
-        <circle class="spot-glow" cx="750" cy="520" r="22"/>
-        <text class="spot-label" x="750" y="490">山居</text>
-      </g>
-
-      <!-- 边塞 -->
-      <g class="poem-spot" data-poem="bianse" tabindex="0" role="button" aria-label="边塞">
-        <path class="greatwall" d="M950,350 L980,340 L1010,355 L1040,345 L1070,360 L1100,350" stroke="#3a3a38" stroke-width="3" fill="none"/>
-        <circle class="spot-glow" cx="1020" cy="340" r="22"/>
-        <text class="spot-label" x="1020" y="310">边塞</text>
-      </g>
-
-      <!-- 月夜 -->
-      <g class="poem-spot" data-poem="yueye" tabindex="0" role="button" aria-label="月夜">
-        <circle class="moon" cx="980" cy="120" r="40" fill="#e8e4d8" opacity="0.85"/>
-        <circle class="moon-crater" cx="965" cy="110" r="8" fill="#d4cfc0" opacity="0.3"/>
-        <circle class="spot-glow" cx="980" cy="120" r="30"/>
-        <text class="spot-label" x="980" y="190">月夜</text>
-      </g>
-
-      <!-- 春晓桃花 -->
-      <g class="poem-spot" data-poem="chunxiao" tabindex="0" role="button" aria-label="春晓">
-        <g class="peach-tree" transform="translate(320, 580)">
-          <path d="M0,80 Q-5,40 0,0 Q5,40 0,80" stroke="#4a3a3a" stroke-width="4" fill="none"/>
-          <circle cx="-20" cy="15" r="8" fill="#8a5a5a" opacity="0.5"/>
-          <circle cx="18" cy="25" r="7" fill="#9a6a6a" opacity="0.45"/>
-          <circle cx="-8" cy="35" r="6" fill="#7a4a4a" opacity="0.4"/>
-        </g>
-        <circle class="spot-glow" cx="320" cy="580" r="22"/>
-        <text class="spot-label" x="320" y="550">春晓</text>
-      </g>
-
-      <!-- 枫桥夜泊 -->
-      <g class="poem-spot" data-poem="fengqiao" tabindex="0" role="button" aria-label="枫桥">
-        <path class="bridge" d="M580,680 Q650,640 720,680" stroke="#2a2a28" stroke-width="4" fill="none"/>
-        <path class="bridge" d="M590,680 L590,700 M650,655 L650,700 M710,680 L710,700" stroke="#2a2a28" stroke-width="2"/>
-        <circle class="spot-glow" cx="650" cy="660" r="22"/>
-        <text class="spot-label" x="650" y="630">枫桥</text>
-      </g>
-
-      <!-- 江雪 -->
-      <g class="poem-spot" data-poem="jiangxue" tabindex="0" role="button" aria-label="江雪">
-        <g transform="translate(480, 640)">
-          <ellipse cx="0" cy="0" rx="25" ry="8" fill="#1a1a18" opacity="0.5"/>
-          <line x1="0" y1="-15" x2="0" y2="15" stroke="#2a2a28" stroke-width="2"/>
-        </g>
-        <circle class="spot-glow" cx="480" cy="640" r="22"/>
-        <text class="spot-label" x="480" y="610">江雪</text>
-      </g>
-
-      <!-- 黄鹤楼 -->
-      <g class="poem-spot" data-poem="huanghelou" tabindex="0" role="button" aria-label="黄鹤楼">
-        <g class="tower" transform="translate(380, 500)">
-          <rect x="-15" y="0" width="30" height="50" fill="#3a3a38" opacity="0.7"/>
-          <path d="M-20,0 L20,0 L15,-15 L-15,-15Z" fill="#2a2a28" opacity="0.8"/>
-          <path d="M-18,-15 L18,-15 L12,-28 L-12,-28Z" fill="#2a2a28" opacity="0.7"/>
-        </g>
-        <circle class="spot-glow" cx="380" cy="490" r="22"/>
-        <text class="spot-label" x="380" y="460">黄鹤楼</text>
-      </g>
+      <!-- 诗词胜迹：由 poems.json 自动生成 -->
+      <g id="sites"></g>
 
       <!-- 前景水墨晕染 -->
-      <path class="ink-splash" d="M0,750 Q300,720 600,760 Q900,780 1200,740 L1200,800 L0,800Z" fill="#1a1a18" opacity="0.08"/>
+      <path class="ink-splash" d="M0,760 Q300,730 600,765 Q900,785 1200,745 L1200,800 L0,800Z" fill="#1a1a18" opacity="0.08"/>
     </svg>
   </main>
 

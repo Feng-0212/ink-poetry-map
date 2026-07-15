@@ -117,50 +117,53 @@ body {
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* 可点击景点 */
+/* 可点击景点（游戏地图式小巧墨标） */
 .poem-spot {
   cursor: pointer;
   outline: none;
-  transition: transform 0.4s ease;
 }
 
-.poem-spot:hover,
-.poem-spot:focus-visible {
-  transform: scale(1.02);
+.spot-token {
+  fill: rgba(245, 238, 222, 0.55);
+  stroke: rgba(35, 33, 28, 0.22);
+  stroke-width: 1;
+  transition: fill 0.3s ease, stroke 0.3s ease;
+}
+
+.spot-icon {
+  color: var(--ink-dark);
+  transition: color 0.3s ease;
+}
+
+.poem-spot:hover .spot-token,
+.poem-spot:focus-visible .spot-token {
+  fill: rgba(158, 59, 50, 0.10);
+  stroke: var(--accent-red);
+}
+
+.poem-spot:hover .spot-icon,
+.poem-spot:focus-visible .spot-icon {
+  color: var(--accent-red);
 }
 
 .spot-glow {
   fill: none;
   stroke: var(--accent-red);
-  stroke-width: 1;
+  stroke-width: 1.2;
   opacity: 0;
-  transition: opacity 0.4s ease, r 0.4s ease;
+  pointer-events: none;
 }
 
 .poem-spot:hover .spot-glow,
 .poem-spot:focus-visible .spot-glow {
   opacity: 0.6;
-  animation: pulse 2s ease-in-out infinite;
+  animation: ping 2.4s ease-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { r: 22; opacity: 0.4; }
-  50%      { r: 30; opacity: 0.7; }
-}
-
-.spot-label {
-  font-family: var(--font-brush);
-  font-size: 22px;
-  fill: var(--ink-dark);
-  text-anchor: middle;
-  opacity: 0.75;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.poem-spot:hover .spot-label,
-.poem-spot:focus-visible .spot-label {
-  opacity: 1;
+@keyframes ping {
+  0%   { r: 16; opacity: 0.5; }
+  70%  { r: 26; opacity: 0; }
+  100% { r: 26; opacity: 0; }
 }
 
 /* 诗词浮层 */

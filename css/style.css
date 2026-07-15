@@ -1,378 +1,392 @@
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ================================================================
+   墨韵山河 · 仙侠图  — 全屏交互式水墨长卷
+   ================================================================ */
 
+/* ---------- 全局 ---------- */
 :root {
-  --ink-dark: #1a1a18;
-  --ink-mid: #3a3a38;
-  --ink-light: #6a6a66;
-  --paper: #e8e4dc;
-  --paper-warm: #d4cfc4;
-  --mist: rgba(232, 228, 220, 0.6);
-  --accent-red: #8b3a3a;
-  --font-brush: 'Ma Shan Zheng', 'ZCOOL XiaoWei', cursive;
+  --ink:       #1c1a16;
+  --ink-mid:   #3a3630;
+  --paper:     #f4ecda;
+  --accent:    #8b3a3a;
+  --accent-lt: rgba(139,58,58,0.10);
+  --jade:      #30d090;
+  --jade-dk:   #107060;
   --font-serif: 'Noto Serif SC', 'SimSun', serif;
+  --font-hand: 'Ma Shan Zheng', 'ZCOOL XiaoWei', serif;
+  --radius:    4px;
 }
 
-html, body {
-  height: 100%;
-  overflow-x: hidden;
-}
-
-body {
-  font-family: var(--font-serif);
-  background: var(--paper);
-  color: var(--ink-dark);
-  min-height: 100vh;
-  position: relative;
-}
-
-/* 宣纸纹理 */
-.paper-texture {
-  position: fixed;
-  inset: 0;
-  background:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
-    linear-gradient(180deg, #ece8e0 0%, #ddd8cc 50%, #d0cabc 100%);
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* 云雾 */
-.mist {
-  position: fixed;
-  width: 120%;
-  height: 40%;
-  background: radial-gradient(ellipse at center, var(--mist) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 1;
-  animation: drift 20s ease-in-out infinite alternate;
-}
-
-.mist-1 { top: 10%; left: -10%; animation-delay: 0s; }
-.mist-2 { top: 40%; right: -10%; animation-delay: -10s; opacity: 0.7; }
-
-@keyframes drift {
-  from { transform: translateX(0) scale(1); opacity: 0.5; }
-  to   { transform: translateX(30px) scale(1.05); opacity: 0.8; }
-}
-
-/* 页头 */
-.site-header {
-  position: relative;
-  z-index: 10;
-  text-align: center;
-  padding: 2rem 1rem 0.5rem;
-}
-
-.site-title {
-  font-family: var(--font-brush);
-  font-size: clamp(2.8rem, 8vw, 5rem);
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  color: var(--ink-dark);
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.05);
-  animation: inkReveal 2s ease-out;
-}
-
-.site-subtitle {
-  font-family: var(--font-serif);
-  font-size: 0.95rem;
-  color: var(--ink-light);
-  letter-spacing: 0.5em;
-  margin-top: 0.3rem;
-  font-weight: 300;
-}
-
-@keyframes inkReveal {
-  from { opacity: 0; filter: blur(8px); transform: translateY(-10px); }
-  to   { opacity: 1; filter: blur(0); transform: translateY(0); }
-}
-
-/* 地图容器 */
+/* ---------- 地图视口（整个交互区） ---------- */
 .map-container {
   position: relative;
-  z-index: 5;
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem 2rem;
+  height: calc(100vh - 180px);
+  min-height: 540px;
+  overflow: hidden;
+  background: #06091a;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.map-container.dragging { cursor: grabbing; }
+
+/* ---------- 世界画布（被平移缩放的主体，3000×1800） ---------- */
+.map-world {
+  position: absolute;
+  top: 0; left: 0;
+  width: 3000px;
+  height: 1800px;
+  transform-origin: 0 0;
+  will-change: transform;
+  overflow: hidden;
 }
 
-.ink-map {
-  width: 100%;
-  height: auto;
+/* SVG 全尺寸 */
+.world-svg {
   display: block;
-  border-radius: 2px;
-  box-shadow:
-    0 4px 24px rgba(26, 26, 24, 0.12),
-    inset 0 0 60px rgba(232, 228, 220, 0.3);
-  animation: mapFadeIn 2.5s ease-out;
+  width: 3000px;
+  height: 1800px;
 }
 
-@keyframes mapFadeIn {
-  from { opacity: 0; transform: scale(0.98); }
-  to   { opacity: 1; transform: scale(1); }
+/* 标记层（覆盖在世界画布之上） */
+.map-markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-/* 地图覆盖层与 HTML 景点按钮 */
-.map-container { position: relative; }
-.map-overlay { position: absolute; inset: 0; pointer-events: none; }
-.map-empty-msg { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #8b3a3a; font-family: var(--font-serif); font-size: 20px; }
-
-.poem-spot {
+/* ---------- 灵石标记（玉色发光宝石按钮） ---------- */
+.poem-stone {
   position: absolute;
   pointer-events: auto;
-  width: 36px;
-  height: 36px;
-  margin: 0;
-  padding: 0;
+  width: 52px;
+  height: 52px;
+  margin: 0; padding: 0;
   background: transparent;
-  border: 0;
+  border: none;
   cursor: pointer;
   transform: translate(-50%, -50%);
   outline: none;
   -webkit-tap-highlight-color: transparent;
-}
-.poem-spot .spot-svg { width: 100%; height: 100%; display: block; overflow: visible; }
-
-.spot-token {
-  fill: rgba(244, 236, 220, 0.85);
-  stroke: rgba(35, 33, 28, 0.40);
-  stroke-width: 1.2;
-  transition: fill 0.3s ease, stroke 0.3s ease;
+  filter: drop-shadow(0 2px 8px rgba(48,208,112,0.35));
+  transition: filter 0.3s ease, transform 0.3s ease;
 }
 
-.spot-icon {
-  color: #2a2a28;
-  transition: color 0.3s ease;
+.poem-stone:hover,
+.poem-stone:focus-visible {
+  filter: drop-shadow(0 4px 18px rgba(48,208,112,0.70));
+  transform: translate(-50%, -50%) scale(1.18);
 }
 
-.spot-icon > * { stroke-width: 1.5; }
-
-.poem-spot:hover .spot-token,
-.poem-spot:focus-visible .spot-token {
-  fill: rgba(158, 59, 50, 0.12);
-  stroke: var(--accent-red);
+.poem-stone:active {
+  transform: translate(-50%, -50%) scale(0.94);
 }
 
-.poem-spot:hover .spot-icon,
-.poem-spot:focus-visible .spot-icon {
-  color: var(--accent-red);
-}
-
-.spot-glow {
-  fill: none;
-  stroke: var(--accent-red);
-  stroke-width: 1.2;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.poem-spot:hover .spot-glow,
-.poem-spot:focus-visible .spot-glow {
-  opacity: 0.6;
-  animation: ping 2.4s ease-out infinite;
-}
-
-@keyframes ping {
-  0%   { r: 16; opacity: 0.5; }
-  70%  { r: 26; opacity: 0; }
-  100% { r: 26; opacity: 0; }
-}
-
-/* 诗词浮层 */
-.poem-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-}
-
-.poem-overlay[hidden] {
-  display: none;
-}
-
-.poem-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(26, 26, 24, 0.55);
-  backdrop-filter: blur(4px);
-  animation: backdropIn 0.5s ease;
-}
-
-@keyframes backdropIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.poem-card {
-  position: relative;
-  background:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
-    linear-gradient(145deg, #f0ece4 0%, #e4dfd4 100%);
-  border: 1px solid rgba(58, 58, 56, 0.2);
-  border-radius: 2px;
-  padding: 3rem 2.5rem 2.5rem;
-  max-width: 520px;
+/* 灵石 SVG */
+.stone-svg {
   width: 100%;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.25),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  animation: poemAppear 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-  overflow: hidden;
+  height: 100%;
+  display: block;
+  overflow: visible;
 }
 
-.poem-card::before {
-  content: '';
+/* 灵石主体动画 */
+.stone-halo {
+  animation: haloPulse 3s ease-in-out infinite;
+}
+.stone-body {
+  animation: bodyBreath 4s ease-in-out infinite;
+}
+@keyframes haloPulse {
+  0%,100% { opacity: 0.18; }
+  50%      { opacity: 0.40; }
+}
+@keyframes bodyBreath {
+  0%,100% { opacity: 0.92; }
+  50%      { opacity: 1.00; }
+}
+
+/* 悬停强化光晕 */
+.poem-stone:hover .stone-halo,
+.poem-stone:focus-visible .stone-halo {
+  animation: haloPulse 1.5s ease-in-out infinite;
+}
+
+/* ---------- HUD 控制面板 ---------- */
+.map-hud {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--ink-mid), transparent);
-  opacity: 0.3;
-}
-
-@keyframes poemAppear {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-    filter: blur(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-}
-
-.poem-close {
-  position: absolute;
-  top: 1rem;
-  right: 1.2rem;
-  background: none;
-  border: none;
-  font-size: 1.8rem;
-  color: var(--ink-light);
-  cursor: pointer;
-  line-height: 1;
-  transition: color 0.2s, transform 0.2s;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
   font-family: var(--font-serif);
 }
 
-.poem-close:hover {
-  color: var(--ink-dark);
-  transform: rotate(90deg);
+/* 标题 */
+.hud-title {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  font-family: var(--font-hand);
+  font-size: 22px;
+  color: rgba(210,200,185,0.75);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+  letter-spacing: 3px;
+  pointer-events: none;
 }
 
-.poem-seal {
+/* 操作提示 */
+.hud-hint {
   position: absolute;
-  top: 1.5rem;
-  left: 1.5rem;
-  width: 48px;
-  height: 48px;
-  border: 2px solid var(--accent-red);
-  color: var(--accent-red);
-  font-family: var(--font-brush);
-  font-size: 1.1rem;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: rgba(180,170,155,0.55);
+  letter-spacing: 2px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* 胜迹计数器 */
+.hud-counter {
+  position: absolute;
+  top: 14px;
+  right: 70px;
+  font-size: 12px;
+  color: rgba(180,170,155,0.60);
+  letter-spacing: 2px;
+  pointer-events: none;
+}
+
+/* 缩放按钮组 */
+.hud-zoom {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.hud-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(20,18,30,0.72);
+  border: 1px solid rgba(180,168,148,0.25);
+  border-radius: 3px;
+  color: rgba(200,188,168,0.85);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  opacity: 0.85;
-  transform: rotate(-5deg);
-  letter-spacing: 0.1em;
+  font-family: var(--font-serif);
+}
+.hud-btn:hover {
+  background: rgba(48,208,112,0.18);
+  border-color: rgba(48,208,112,0.50);
+  color: var(--jade);
+}
+.hud-btn:active {
+  background: rgba(48,208,112,0.30);
 }
 
+/* ---------- 诗词浮层（保留原有样式） ---------- */
+.poem-overlay { /* 复用原样式 */ }
+.poem-backdrop { /* 复用 */ }
+.poem-card    { /* 复用 */ }
+.poem-close   { /* 复用 */ }
+.poem-seal    { /* 复用 */ }
+.poem-title   { /* 复用 */ }
+.poem-meta    { /* 复用 */ }
+.poem-body    { /* 复用 */ }
+.poem-note    { /* 复用 */ }
+
+/* 复用的诗词层样式（来自原版） */
+.poem-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.poem-overlay[hidden] { display: none; }
+.poem-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(12,10,8,0.82);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.poem-card {
+  position: relative;
+  max-width: 520px;
+  width: 90vw;
+  background: var(--paper);
+  border-radius: 6px;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(139,58,58,0.2);
+  padding: 40px 44px 36px;
+  font-family: var(--font-serif);
+  color: var(--ink);
+  animation: slideUp 0.28s ease-out;
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.poem-close {
+  position: absolute;
+  top: 14px; right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 26px;
+  color: rgba(139,58,58,0.45);
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+.poem-close:hover { color: var(--accent); }
+.poem-seal {
+  position: absolute;
+  top: 14px; left: 18px;
+  width: 40px; height: 40px;
+  background: var(--accent);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-hand);
+  font-size: 22px;
+  color: var(--paper);
+  letter-spacing: 1px;
+}
 .poem-title {
-  font-family: var(--font-brush);
-  font-size: clamp(1.8rem, 5vw, 2.4rem);
-  font-weight: 400;
-  text-align: center;
-  margin: 0.5rem 0 0.3rem;
-  letter-spacing: 0.15em;
-  color: var(--ink-dark);
+  font-family: var(--font-hand);
+  font-size: 32px;
+  color: var(--ink);
+  margin: 50px 0 4px;
+  letter-spacing: 4px;
 }
-
 .poem-meta {
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--ink-light);
-  letter-spacing: 0.3em;
-  margin-bottom: 2rem;
-  font-weight: 300;
+  font-size: 14px;
+  color: rgba(28,26,22,0.55);
+  margin-bottom: 22px;
+  letter-spacing: 1px;
 }
-
 .poem-body {
-  font-family: var(--font-brush);
-  font-size: clamp(1.4rem, 4vw, 1.9rem);
-  line-height: 2.2;
-  text-align: center;
-  color: var(--ink-dark);
-  letter-spacing: 0.08em;
+  font-size: 17px;
+  line-height: 2;
+  color: var(--ink-mid);
+  letter-spacing: 2px;
   white-space: pre-line;
-  animation: inkWrite 1.2s ease-out 0.3s both;
 }
-
-@keyframes inkWrite {
-  from { opacity: 0; letter-spacing: 0.3em; filter: blur(2px); }
-  to   { opacity: 1; letter-spacing: 0.08em; filter: blur(0); }
-}
-
 .poem-note {
-  margin-top: 2rem;
-  font-size: 0.8rem;
-  color: var(--ink-light);
-  text-align: center;
-  font-weight: 300;
-  letter-spacing: 0.1em;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(139,58,58,0.15);
+  font-size: 13px;
+  color: rgba(139,58,58,0.75);
+  line-height: 1.8;
+  letter-spacing: 1px;
   font-style: italic;
-  border-top: 1px solid rgba(58, 58, 56, 0.15);
-  padding-top: 1rem;
 }
 
-/* 页脚 */
+/* ---------- 宣纸/云雾（复用原氛围） ---------- */
+.paper-texture {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 30% 40%, rgba(240,232,215,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 70% 60%, rgba(210,200,180,0.04) 0%, transparent 70%);
+}
+.mist {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+}
+.mist-1 {
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 30% at 20% 80%, rgba(200,190,170,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 25% at 80% 20%, rgba(200,190,170,0.05) 0%, transparent 65%);
+  animation: mistDrift1 22s ease-in-out infinite;
+}
+.mist-2 {
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 25% at 70% 70%, rgba(200,190,170,0.06) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 20% at 30% 30%, rgba(200,190,170,0.04) 0%, transparent 60%);
+  animation: mistDrift2 28s ease-in-out infinite;
+}
+@keyframes mistDrift1 {
+  0%,100% { opacity: 0.7; transform: translate(0,0); }
+  50%      { opacity: 1.0; transform: translate(8px,-5px); }
+}
+@keyframes mistDrift2 {
+  0%,100% { opacity: 0.6; transform: translate(0,0); }
+  50%      { opacity: 0.9; transform: translate(-6px,4px); }
+}
+
+/* ---------- 页头页脚（复用） ---------- */
+.site-header {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 18px 20px 12px;
+}
+.site-title {
+  font-family: var(--font-hand);
+  font-size: 30px;
+  color: var(--ink);
+  letter-spacing: 6px;
+  margin: 0 0 4px;
+}
+.site-subtitle {
+  font-size: 12px;
+  color: rgba(28,26,22,0.40);
+  letter-spacing: 4px;
+  margin: 0;
+}
 .site-footer {
   position: relative;
   z-index: 10;
   text-align: center;
-  padding: 1rem;
-  font-family: var(--font-brush);
-  font-size: 1.1rem;
-  color: var(--ink-light);
-  letter-spacing: 0.4em;
+  padding: 10px 20px 14px;
+  font-family: var(--font-hand);
+  font-size: 13px;
+  color: rgba(28,26,22,0.30);
+  letter-spacing: 3px;
 }
 
-/* 响应式 */
-@media (max-width: 768px) {
-  .site-header {
-    padding-top: 1.2rem;
-  }
-
-  .poem-card {
-    padding: 2.5rem 1.5rem 2rem;
-  }
-
-  .poem-seal {
-    width: 40px;
-    height: 40px;
-    font-size: 0.95rem;
-  }
-
-  .spot-label {
-    font-size: 16px;
-  }
+/* ---------- 空数据提示 ---------- */
+.map-empty-msg {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  color: rgba(200,188,168,0.6);
+  font-family: var(--font-serif);
+  font-size: 18px;
+  letter-spacing: 2px;
+  pointer-events: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+/* ---------- 响应式 ---------- */
+@media (max-width: 640px) {
+  .map-container { height: calc(100vh - 160px); min-height: 400px; }
+  .hud-title { font-size: 18px; top: 10px; left: 12px; }
+  .hud-hint  { bottom: 10px; font-size: 11px; }
+  .hud-zoom  { bottom: 8px; right: 10px; }
+  .hud-btn   { width: 32px; height: 32px; font-size: 18px; }
+  .poem-card { padding: 32px 28px 28px; }
+  .poem-title { font-size: 26px; }
+  .poem-body  { font-size: 15px; }
 }

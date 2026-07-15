@@ -113,11 +113,10 @@ closeBtn.addEventListener('click', hidePoem);
 overlay.querySelector('.poem-backdrop').addEventListener('click', hidePoem);
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) hidePoem(); });
 
-/* ---------- 加载诗词数据 ---------- */
-fetch('poems.json')
-  .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then(poems => render(poems))
-  .catch(err => {
-    console.error('加载 poems.json 失败：', err);
-    sitesG.innerHTML = '<text x="600" y="400" text-anchor="middle" fill="#8b3a3a" font-size="20" font-family="serif">诗词数据加载失败，请通过 GitHub Pages 访问，或检查 poems.json</text>';
-  });
+/* ---------- 加载诗词数据（由 poems.js 提供全局 window.POEMS） ---------- */
+const POEMS = (typeof window !== 'undefined' && window.POEMS) ? window.POEMS : [];
+if (POEMS.length) {
+  render(POEMS);
+} else {
+  sitesG.innerHTML = '<text x="600" y="400" text-anchor="middle" fill="#8b3a3a" font-size="20" font-family="serif">未找到诗词数据，请检查 poems.js</text>';
+}

@@ -1,0 +1,358 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --ink-dark: #1a1a18;
+  --ink-mid: #3a3a38;
+  --ink-light: #6a6a66;
+  --paper: #e8e4dc;
+  --paper-warm: #d4cfc4;
+  --mist: rgba(232, 228, 220, 0.6);
+  --accent-red: #8b3a3a;
+  --font-brush: 'Ma Shan Zheng', 'ZCOOL XiaoWei', cursive;
+  --font-serif: 'Noto Serif SC', 'SimSun', serif;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-serif);
+  background: var(--paper);
+  color: var(--ink-dark);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* 宣纸纹理 */
+.paper-texture {
+  position: fixed;
+  inset: 0;
+  background:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #ece8e0 0%, #ddd8cc 50%, #d0cabc 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 云雾 */
+.mist {
+  position: fixed;
+  width: 120%;
+  height: 40%;
+  background: radial-gradient(ellipse at center, var(--mist) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  animation: drift 20s ease-in-out infinite alternate;
+}
+
+.mist-1 { top: 10%; left: -10%; animation-delay: 0s; }
+.mist-2 { top: 40%; right: -10%; animation-delay: -10s; opacity: 0.7; }
+
+@keyframes drift {
+  from { transform: translateX(0) scale(1); opacity: 0.5; }
+  to   { transform: translateX(30px) scale(1.05); opacity: 0.8; }
+}
+
+/* 页头 */
+.site-header {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 2rem 1rem 0.5rem;
+}
+
+.site-title {
+  font-family: var(--font-brush);
+  font-size: clamp(2.8rem, 8vw, 5rem);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: var(--ink-dark);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+  animation: inkReveal 2s ease-out;
+}
+
+.site-subtitle {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: var(--ink-light);
+  letter-spacing: 0.5em;
+  margin-top: 0.3rem;
+  font-weight: 300;
+}
+
+@keyframes inkReveal {
+  from { opacity: 0; filter: blur(8px); transform: translateY(-10px); }
+  to   { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+/* 地图容器 */
+.map-container {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+.ink-map {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 2px;
+  box-shadow:
+    0 4px 24px rgba(26, 26, 24, 0.12),
+    inset 0 0 60px rgba(232, 228, 220, 0.3);
+  animation: mapFadeIn 2.5s ease-out;
+}
+
+@keyframes mapFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* 可点击景点 */
+.poem-spot {
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.4s ease;
+}
+
+.poem-spot:hover,
+.poem-spot:focus-visible {
+  transform: scale(1.02);
+}
+
+.spot-glow {
+  fill: none;
+  stroke: var(--accent-red);
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease, r 0.4s ease;
+}
+
+.poem-spot:hover .spot-glow,
+.poem-spot:focus-visible .spot-glow {
+  opacity: 0.6;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { r: 22; opacity: 0.4; }
+  50%      { r: 30; opacity: 0.7; }
+}
+
+.spot-label {
+  font-family: var(--font-brush);
+  font-size: 22px;
+  fill: var(--ink-dark);
+  text-anchor: middle;
+  opacity: 0.75;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.poem-spot:hover .spot-label,
+.poem-spot:focus-visible .spot-label {
+  opacity: 1;
+}
+
+/* 诗词浮层 */
+.poem-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.poem-overlay[hidden] {
+  display: none;
+}
+
+.poem-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 24, 0.55);
+  backdrop-filter: blur(4px);
+  animation: backdropIn 0.5s ease;
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.poem-card {
+  position: relative;
+  background:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
+    linear-gradient(145deg, #f0ece4 0%, #e4dfd4 100%);
+  border: 1px solid rgba(58, 58, 56, 0.2);
+  border-radius: 2px;
+  padding: 3rem 2.5rem 2.5rem;
+  max-width: 520px;
+  width: 100%;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  animation: poemAppear 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+
+.poem-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--ink-mid), transparent);
+  opacity: 0.3;
+}
+
+@keyframes poemAppear {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.poem-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--ink-light);
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s, transform 0.2s;
+  font-family: var(--font-serif);
+}
+
+.poem-close:hover {
+  color: var(--ink-dark);
+  transform: rotate(90deg);
+}
+
+.poem-seal {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--accent-red);
+  color: var(--accent-red);
+  font-family: var(--font-brush);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  opacity: 0.85;
+  transform: rotate(-5deg);
+  letter-spacing: 0.1em;
+}
+
+.poem-title {
+  font-family: var(--font-brush);
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  font-weight: 400;
+  text-align: center;
+  margin: 0.5rem 0 0.3rem;
+  letter-spacing: 0.15em;
+  color: var(--ink-dark);
+}
+
+.poem-meta {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  letter-spacing: 0.3em;
+  margin-bottom: 2rem;
+  font-weight: 300;
+}
+
+.poem-body {
+  font-family: var(--font-brush);
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  line-height: 2.2;
+  text-align: center;
+  color: var(--ink-dark);
+  letter-spacing: 0.08em;
+  white-space: pre-line;
+  animation: inkWrite 1.2s ease-out 0.3s both;
+}
+
+@keyframes inkWrite {
+  from { opacity: 0; letter-spacing: 0.3em; filter: blur(2px); }
+  to   { opacity: 1; letter-spacing: 0.08em; filter: blur(0); }
+}
+
+.poem-note {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--ink-light);
+  text-align: center;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  font-style: italic;
+  border-top: 1px solid rgba(58, 58, 56, 0.15);
+  padding-top: 1rem;
+}
+
+/* 页脚 */
+.site-footer {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 1rem;
+  font-family: var(--font-brush);
+  font-size: 1.1rem;
+  color: var(--ink-light);
+  letter-spacing: 0.4em;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .site-header {
+    padding-top: 1.2rem;
+  }
+
+  .poem-card {
+    padding: 2.5rem 1.5rem 2rem;
+  }
+
+  .poem-seal {
+    width: 40px;
+    height: 40px;
+    font-size: 0.95rem;
+  }
+
+  .spot-label {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

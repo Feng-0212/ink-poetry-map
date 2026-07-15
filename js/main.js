@@ -48,19 +48,16 @@ function hash(str) {
 }
 function layout(poems) {
   const range = {
-    moon: [105, 165], mountain: [430, 540], waterfall: [430, 540],
-    tower: [380, 500], pavilion: [380, 500], bamboo: [380, 500], pass: [380, 500],
+    moon: [110, 165], mountain: [430, 540], waterfall: [430, 540],
+    tower: [380, 505], pavilion: [380, 505], bamboo: [380, 505], pass: [380, 505],
     lake: [560, 685], boat: [560, 685], snow: [560, 685], bridge: [560, 685], blossom: [560, 685]
   };
-  const byScene = {};
-  poems.forEach(p => { const s = detectScene(p); (byScene[s] = byScene[s] || []).push(p); });
-  poems.forEach(p => {
+  const placed = [];
+  const n = poems.length;
+  poems.forEach((p, i) => {
     const s = detectScene(p);
     const r = range[s] || range.mountain;
-    const group = byScene[s];
-    const idx = group.indexOf(p);
-    const n = group.length;
-    const x = n === 1 ? 600 : 150 + (1050 - 150) * (idx / (n - 1)) + (hash(p.id) - 0.5) * 40;
+    const x = n === 1 ? 600 : 150 + (1050 - 150) * (i / (n - 1)) + (hash(p.id) - 0.5) * 50;
     const y = r[0] + hash(p.id + 'y') * (r[1] - r[0]);
     placed.push({ poem: p, x, y, scene: s });
   });

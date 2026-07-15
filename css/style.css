@@ -118,7 +118,7 @@ body {
 }
 
 /* 地图覆盖层与 HTML 景点按钮 */
-.map-container { position: relative; }
+.map-container { position: relative; overflow: hidden; }
 .map-overlay { position: absolute; inset: 0; pointer-events: none; }
 .map-empty-msg { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #8b3a3a; font-family: var(--font-serif); font-size: 20px; }
 

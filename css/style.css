@@ -117,11 +117,26 @@ body {
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* 可点击景点（游戏地图式小巧墨标） */
+/* 地图覆盖层与 HTML 景点按钮 */
+.map-container { position: relative; }
+.map-overlay { position: absolute; inset: 0; pointer-events: none; }
+.map-empty-msg { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #8b3a3a; font-family: var(--font-serif); font-size: 20px; }
+
 .poem-spot {
+  position: absolute;
+  pointer-events: auto;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
   cursor: pointer;
+  transform: translate(-50%, -50%);
   outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
+.poem-spot .spot-svg { width: 100%; height: 100%; display: block; overflow: visible; }
 
 .spot-token {
   fill: rgba(244, 236, 220, 0.85);
@@ -135,13 +150,11 @@ body {
   transition: color 0.3s ease;
 }
 
-.spot-icon > * {
-  stroke-width: 1.5;
-}
+.spot-icon > * { stroke-width: 1.5; }
 
 .poem-spot:hover .spot-token,
 .poem-spot:focus-visible .spot-token {
-  fill: rgba(158, 59, 50, 0.10);
+  fill: rgba(158, 59, 50, 0.12);
   stroke: var(--accent-red);
 }
 

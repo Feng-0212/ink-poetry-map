@@ -73,12 +73,12 @@
       <path d="M120,150 C260,120 360,170 520,140 C420,180 300,200 200,200 Z" fill="#fff" opacity="0.16" filter="url(#ink-blur)"/>
       <path d="M760,110 C900,85 1000,130 1160,105 C1060,145 940,165 850,160 Z" fill="#fff" opacity="0.14" filter="url(#ink-blur)"/>
 
-      <!-- 诗词胜迹：由 poems.json 自动生成 -->
-      <g id="sites"></g>
+      <!-- 诗词胜迹由 poems.js + main.js 渲染到下方 .map-overlay -->
 
       <!-- 前景水墨晕染 -->
       <path class="ink-splash" d="M0,760 Q300,730 600,765 Q900,785 1200,745 L1200,800 L0,800Z" fill="#1a1a18" opacity="0.08"/>
     </svg>
+    <div class="map-overlay" id="mapOverlay"></div>
   </main>
 
   <!-- 诗词浮层 -->

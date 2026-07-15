@@ -64,41 +64,31 @@ function layout(poems) {
   return placed;
 }
 
-/* ---------- 渲染 ---------- */
-const SVGNS = 'http://www.w3.org/2000/svg';
-const sitesG = document.getElementById('sites');
-
-function svgFragment(markup) {
-  const doc = new DOMParser().parseFromString(
-    '<svg xmlns="http://www.w3.org/2000/svg">' + markup + '</svg>', 'image/svg+xml');
-  const frag = document.createDocumentFragment();
-  const root = doc.documentElement;
-  while (root.firstChild) {
-    frag.appendChild(document.importNode(root.firstChild, true));
-    root.removeChild(root.firstChild);
-  }
-  return frag;
-}
+/* ---------- 渲染（HTML 按钮 + 内联 SVG，绝对定位覆盖在水墨图上） ---------- */
+const mapOverlay = document.getElementById('mapOverlay');
 
 function render(poems) {
-  while (sitesG.firstChild) sitesG.removeChild(sitesG.firstChild);
+  while (mapOverlay.firstChild) mapOverlay.removeChild(mapOverlay.firstChild);
   const placed = layout(poems);
   placed.forEach(({ poem, x, y, scene }) => {
-    const g = document.createElementNS(SVGNS, 'g');
-    g.setAttribute('class', 'poem-spot');
-    g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`);
-    g.setAttribute('tabindex', '0');
-    g.setAttribute('role', 'button');
-    g.setAttribute('aria-label', `${poem.title} · ${poem.dynasty} · ${poem.author}`);
-    g.appendChild(svgFragment(
-      '<circle class="spot-token" r="18"></circle>' +
-      '<circle class="spot-glow" r="18"></circle>' +
-      '<g class="spot-icon">' + (SCENES[scene] || SCENES.mountain) + '</g>'));
-    g.addEventListener('click', () => showPoem(poem));
-    g.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showPoem(poem); }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'poem-spot';
+    btn.style.left = (x / 1200 * 100) + '%';
+    btn.style.top  = (y / 800 * 100) + '%';
+    btn.setAttribute('aria-label', `${poem.title} · ${poem.dynasty} · ${poem.author}`);
+    btn.title = poem.title;
+    btn.innerHTML =
+      '<svg viewBox="-20 -20 40 40" class="spot-svg" xmlns="http://www.w3.org/2000/svg">' +
+        '<circle class="spot-token" r="18"></circle>' +
+        '<circle class="spot-glow" r="18"></circle>' +
+        '<g class="spot-icon">' + (SCENES[scene] || SCENES.mountain) + '</g>' +
+      '</svg>';
+    btn.addEventListener('click', () => showPoem(poem));
+    btn.addEventListener('keydown', e => {
+      if (e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); showPoem(poem); }
     });
-    sitesG.appendChild(g);
+    mapOverlay.appendChild(btn);
   });
 }
 
@@ -127,5 +117,8 @@ const POEMS = (typeof window !== 'undefined' && window.POEMS) ? window.POEMS : [
 if (POEMS.length) {
   render(POEMS);
 } else {
-  sitesG.appendChild(svgFragment('<text x="600" y="400" text-anchor="middle" fill="#8b3a3a" font-size="20" font-family="serif">未找到诗词数据，请检查 poems.js</text>'));
+  const msg = document.createElement('div');
+  msg.className = 'map-empty-msg';
+  msg.textContent = '未找到诗词数据，请检查 poems.js';
+  mapOverlay.appendChild(msg);
 }

@@ -124,15 +124,19 @@ body {
 }
 
 .spot-token {
-  fill: rgba(245, 238, 222, 0.55);
-  stroke: rgba(35, 33, 28, 0.22);
-  stroke-width: 1;
+  fill: rgba(244, 236, 220, 0.85);
+  stroke: rgba(35, 33, 28, 0.40);
+  stroke-width: 1.2;
   transition: fill 0.3s ease, stroke 0.3s ease;
 }
 
 .spot-icon {
-  color: var(--ink-dark);
+  color: #2a2a28;
   transition: color 0.3s ease;
+}
+
+.spot-icon > * {
+  stroke-width: 1.5;
 }
 
 .poem-spot:hover .spot-token,
